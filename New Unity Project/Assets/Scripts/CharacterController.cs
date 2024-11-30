@@ -6,10 +6,12 @@ public class CharacterController : MonoBehaviour
 {
     public float velocidad;
     public float FuerzaSalto;
+    public int SaltosMax;
     public LayerMask CapaSuelo;
 
     private Rigidbody2D rigidbody;
     private BoxCollider2D boxCollider;
+    private int SaltosRestantes; 
 
     private bool Miraderecha = true;
 
@@ -19,20 +21,27 @@ public class CharacterController : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
-
+        SaltosRestantes = SaltosMax;
     }
+
     bool Tocapiso()
     {
         RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider.bounds.center, new Vector2(boxCollider.bounds.size.x, boxCollider.bounds.size.y), 0f, Vector2.down, 0.2f,CapaSuelo);
         return raycastHit.collider != null; 
     }
+
     void Procesarsaltos()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Tocapiso())
+        if (Tocapiso())
         {
+            SaltosRestantes = SaltosMax; 
+        }
+        if (Input.GetKeyDown(KeyCode.Space) && SaltosRestantes>0)
+        {
+            SaltosRestantes --; /*Resto saltos restantes*/
+            rigidbody.velocity = new Vector2(rigidbody.velocity.x, 0f);
             //fuerza vertical al personaje
             rigidbody.AddForce(Vector2.up * FuerzaSalto, ForceMode2D.Impulse);
-
         }
     }
     void Procesarmovimientos()
